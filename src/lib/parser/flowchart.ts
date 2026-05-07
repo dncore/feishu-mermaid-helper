@@ -20,7 +20,7 @@ export function parseFlowchart(code: string): ParseResult {
   const lines = code.split('\n').map(l => l.trim()).filter(l => l && !skip.test(l))
 
   const seg = '([A-Za-z0-9_-]+(?:\\[[^\\]]+\\]|\\{[^}]+\\}|\\(\\([^)]+\\)\\)|\\([^)]+\\)|>[^\\]]+\\])?)'
-  const edgeRe = new RegExp(`^${seg}\\s*(-->|---|-.->|==>)\\s*(?:\\|([^|]*)\\|)?\\s*${seg}$`)
+  const edgeRe = new RegExp(`^${seg}\\s*(-->|---|\\-\\.\\->|==>)\\s*(?:\\|([^|]*)\\|)?\\s*${seg}$`)
 
   for (const line of lines.slice(1)) {
     const em = line.match(edgeRe)
@@ -39,7 +39,7 @@ export function parseFlowchart(code: string): ParseResult {
       })
       continue
     }
-    const nm = line.match(/^([A-Za-z0-9_-]+(?:\[[^\]]+\]|\{[^}]+\}|\([^)]+\))?)\s*$/)
+    const nm = line.match(/^([A-Za-z0-9_-]+(?:\[[^\]]+\]|\{[^}]+\}|\([^)]+\)|>[^\]]+\])?)\s*$/)
     if (nm) {
       const n = extractNodeRef(nm[1])
       if (!nodeMap.has(n.id)) nodeMap.set(n.id, { label: n.label, shape: n.shape })

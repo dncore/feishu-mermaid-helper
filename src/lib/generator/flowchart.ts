@@ -7,7 +7,7 @@ function toMermaid(node: Node<FlowchartNodeData>): string {
     case 'diamond':      return `${node.id}{${label}}`
     case 'circle':       return `${node.id}((${label}))`
     case 'rounded':      return `${node.id}(${label})`
-    case 'parallelogram':return `${node.id}[/${label}/]`
+    case 'parallelogram':return `${node.id}>[${label}]`
     default:             return `${node.id}[${label}]`
   }
 }
@@ -27,7 +27,7 @@ export function generateFlowchart(nodes: Node[], edges: Edge[]): string {
     const s = (edge.data as { arrowStyle?: string })?.arrowStyle
     const arrow = s === 'none' ? '---' : s === 'dotted' ? '-.->' : s === 'thick' ? '==>' : '-->'
     const lbl = edge.label ? `|${edge.label}|` : ''
-    lines.push(`    ${toMermaid(src)} ${arrow}${lbl} ${toMermaid(tgt)}`)
+    lines.push(`    ${toMermaid(src)} ${arrow}${lbl ? lbl + ' ' : ' '}${toMermaid(tgt)}`)
   }
   return lines.join('\n')
 }
