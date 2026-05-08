@@ -12,8 +12,10 @@ export function EditorModal() {
   const [guard, setGuard] = useState(false)
 
   useEffect(() => {
-    const r = parse(code)
-    setNodesAndEdges(r.nodes, r.edges)
+    try {
+      const r = parse(code)
+      setNodesAndEdges(r.nodes, r.edges)
+    } catch { /* ignore parse errors on initial code */ }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const save = useCallback(() => {
@@ -22,6 +24,8 @@ export function EditorModal() {
       closeEditor()
       if (sourceElementId) highlightBlock(sourceElementId)
       showToast('Mermaid code copied — paste it into the code block to update the diagram')
+    }).catch(() => {
+      showToast('Failed to copy — please copy the code manually from the panel')
     })
   }, [closeEditor, sourceElementId, showToast])
 
