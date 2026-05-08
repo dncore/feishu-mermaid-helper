@@ -16,7 +16,7 @@ export function TriggerBadge({ onEdit }: Props) {
     <button className="badge"
       onClick={e => { e.stopPropagation(); e.preventDefault(); onEdit() }}
       title="Open Mermaid Visual Editor">
-      ✏️ Edit visually
+      {'✏️'} Edit visually
     </button>
   )
 }

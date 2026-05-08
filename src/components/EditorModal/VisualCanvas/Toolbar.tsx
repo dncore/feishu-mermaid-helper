@@ -33,8 +33,8 @@ export function Toolbar() {
       <span style={{ fontSize: 11, fontWeight: 700, color: '#5c7cfa', background: '#e7f5ff',
         padding: '2px 8px', borderRadius: 10 }}>{diagramType}</span>
       <button style={btn} onClick={() => zoomIn()} title="Zoom In">+</button>
-      <button style={btn} onClick={() => zoomOut()} title="Zoom Out">−</button>
-      <button style={btn} onClick={() => fitView()} title="Fit View">⊡</button>
+      <button style={btn} onClick={() => zoomOut()} title="Zoom Out">&minus;</button>
+      <button style={btn} onClick={() => fitView()} title="Fit View">{'⊡'}</button>
       <button style={btn} onClick={addNode} title="Add Node">+ Node</button>
     </div>
   )

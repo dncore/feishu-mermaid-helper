@@ -11,7 +11,7 @@ export function GanttNode({ data }: NodeProps<Node<GanttNodeData>>) {
       padding: '8px 14px', borderRadius: 20, fontSize: 12, minWidth: 120, cursor: 'grab' }}>
       <Handle type="target" position={Position.Left} />
       <div style={{ fontWeight: 600 }}>{data.label}</div>
-      <div style={{ fontSize: 10, opacity: 0.85 }}>{data.section} · {data.duration}</div>
+      <div style={{ fontSize: 10, opacity: 0.85 }}>{data.section}{' · '}{data.duration}</div>
       <Handle type="source" position={Position.Right} />
     </div>
   )

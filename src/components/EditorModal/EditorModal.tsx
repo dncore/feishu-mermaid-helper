@@ -23,9 +23,9 @@ export function EditorModal() {
     navigator.clipboard.writeText(cur).then(() => {
       closeEditor()
       if (sourceElementId) highlightBlock(sourceElementId)
-      showToast('Mermaid code copied — paste it into the code block to update the diagram')
+      showToast('Mermaid code copied \u2014 paste it into the code block to update the diagram')
     }).catch(() => {
-      showToast('Failed to copy — please copy the code manually from the panel')
+      showToast('Failed to copy \u2014 please copy the code manually from the panel')
     })
   }, [closeEditor, sourceElementId, showToast])
 
@@ -49,7 +49,7 @@ export function EditorModal() {
         <header className={styles.header}>
           <span className={styles.tag}>{diagramType}</span>
           <span className={styles.title}>Mermaid Visual Editor</span>
-          <button className={styles.close} onClick={cancel}>×</button>
+          <button className={styles.close} onClick={cancel}>&times;</button>
         </header>
 
         <div className={styles.body}>
