@@ -28,6 +28,7 @@ export interface GanttNodeData extends Record<string, unknown> {
   label: string
   section: string
   duration: string
+  startDate?: string
   status: '' | 'active' | 'done' | 'crit'
 }
 

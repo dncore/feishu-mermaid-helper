@@ -30,4 +30,10 @@ describe('parseFlowchart', () => {
     const { nodes } = parseFlowchart('graph TD\n    A --> B --> C')
     expect(nodes.every(n => n.position != null)).toBe(true)
   })
+
+  it('detects parallelogram shape for [/label/] syntax', () => {
+    const { nodes } = parseFlowchart('graph TD\n    A[/Input/] --> B[Result]')
+    expect(nodes.find(n => n.id === 'A')?.data.shape).toBe('parallelogram')
+    expect(nodes.find(n => n.id === 'A')?.data.label).toBe('Input')
+  })
 })

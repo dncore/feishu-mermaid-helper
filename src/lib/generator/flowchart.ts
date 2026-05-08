@@ -7,7 +7,7 @@ function toMermaid(node: Node<FlowchartNodeData>): string {
     case 'diamond':      return `${node.id}{${label}}`
     case 'circle':       return `${node.id}((${label}))`
     case 'rounded':      return `${node.id}(${label})`
-    case 'parallelogram':return `${node.id}>[${label}]`
+    case 'parallelogram':return `${node.id}[/${label}/]`
     default:             return `${node.id}[${label}]`
   }
 }

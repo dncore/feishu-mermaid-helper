@@ -13,7 +13,7 @@ export function generateGantt(nodes: Node[], _edges: unknown[]): string {
     if (sec !== 'default') lines.push(`    section ${sec}`)
     for (const t of tasks) {
       const sp = t.data.status ? `${t.data.status}, ` : ''
-      lines.push(`    ${t.data.label} :${sp}${t.id}, 2024-01-01, ${t.data.duration}`)
+      lines.push(`    ${t.data.label} :${sp}${t.id}, ${t.data.startDate || '2024-01-01'}, ${t.data.duration}`)
     }
   }
   return lines.join('\n')

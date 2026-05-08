@@ -3,12 +3,15 @@ import type { FlowchartNodeData, FlowShape, ParseResult } from '../types'
 
 function extractNodeRef(raw: string): { id: string; label: string; shape: FlowShape } {
   const m = raw.match(
-    /^([A-Za-z0-9_-]+)(?:\[([^\]]+)\]|\{([^}]+)\}|\(\(([^)]+)\)\)|\(([^)]+)\)|>([^\]]+)\])?$/
+    /^([A-Za-z0-9_-]+)(?:\[([^\]]+)\]|\{([^}]+)\}|\(\(([^)]+)\)\)|\(([^)]+)\))?$/
   )
   if (!m) return { id: raw, label: raw, shape: 'rect' }
-  const [, id, rect, diamond, circle, rounded, flag] = m
-  const label = (rect ?? diamond ?? circle ?? rounded ?? flag ?? id).trim()
-  const shape: FlowShape = diamond ? 'diamond' : circle ? 'circle' : rounded ? 'rounded' : flag ? 'parallelogram' : 'rect'
+  const [, id, rect, diamond, circle, rounded] = m
+  const isParallelogram = rect != null && rect.trim().startsWith('/') && rect.trim().endsWith('/')
+  const label = isParallelogram
+    ? rect.trim().slice(1, -1).trim()
+    : (rect ?? diamond ?? circle ?? rounded ?? id).trim()
+  const shape: FlowShape = diamond ? 'diamond' : circle ? 'circle' : rounded ? 'rounded' : isParallelogram ? 'parallelogram' : 'rect'
   return { id, label, shape }
 }
 
@@ -19,7 +22,7 @@ export function parseFlowchart(code: string): ParseResult {
 
   const lines = code.split('\n').map(l => l.trim()).filter(l => l && !skip.test(l))
 
-  const seg = '([A-Za-z0-9_-]+(?:\\[[^\\]]+\\]|\\{[^}]+\\}|\\(\\([^)]+\\)\\)|\\([^)]+\\)|>[^\\]]+\\])?)'
+  const seg = '([A-Za-z0-9_-]+(?:\\[[^\\]]+\\]|\\{[^}]+\\}|\\(\\([^)]+\\)\\)|\\([^)]+\\))?)'
   const edgeRe = new RegExp(`^${seg}\\s*(-->|---|\\-\\.\\->|==>)\\s*(?:\\|([^|]*)\\|)?\\s*${seg}$`)
 
   for (const line of lines.slice(1)) {
@@ -39,7 +42,7 @@ export function parseFlowchart(code: string): ParseResult {
       })
       continue
     }
-    const nm = line.match(/^([A-Za-z0-9_-]+(?:\[[^\]]+\]|\{[^}]+\}|\([^)]+\)|>[^\]]+\])?)\s*$/)
+    const nm = line.match(/^([A-Za-z0-9_-]+(?:\[[^\]]+\]|\{[^}]+\}|\([^)]+\))?)\s*$/)
     if (nm) {
       const n = extractNodeRef(nm[1])
       if (!nodeMap.has(n.id)) nodeMap.set(n.id, { label: n.label, shape: n.shape })

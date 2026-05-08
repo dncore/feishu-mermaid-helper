@@ -4,7 +4,6 @@ import {
   addEdge, applyNodeChanges, applyEdgeChanges,
   type Connection, type OnNodesChange, type OnEdgesChange,
 } from '@xyflow/react'
-import '@xyflow/react/dist/style.css'
 import { useEditorStore } from '../../../store/editor'
 import { generate } from '../../../lib/generator'
 import { nodeTypes } from '../NodeTypes'

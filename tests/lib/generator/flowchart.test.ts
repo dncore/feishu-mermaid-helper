@@ -21,8 +21,8 @@ describe('generateFlowchart', () => {
     expect(code).toContain('D{Check?}')
   })
 
-  it('includes edge label when present', () => {
-    const code = generateFlowchart([n('A', 'A'), n('B', 'B')], [{ id: 'e1', source: 'A', target: 'B', label: 'yes' }])
-    expect(code).toContain('|yes|')
+  it('uses [/label/] for parallelogram nodes', () => {
+    const code = generateFlowchart([n('A', 'X'), n('I', 'Input', 'parallelogram')], [{ id: 'e1', source: 'A', target: 'I' }])
+    expect(code).toContain('I[/Input/]')
   })
 })

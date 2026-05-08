@@ -2,10 +2,11 @@ import { defineContentScript } from 'wxt/utils/define-content-script'
 import { createShadowRootUi } from 'wxt/utils/content-script-ui/shadow-root'
 import { createRoot, type Root } from 'react-dom/client'
 import { createElement } from 'react'
+import reactflowCss from '@xyflow/react/dist/style.css?raw'
 import { startDetector } from '../lib/detector'
 import { detectDiagramType } from '../lib/diagramType'
 import { useEditorStore } from '../store/editor'
-import { TriggerBadge } from '../components/TriggerBadge/TriggerBadge'
+import { TriggerBadge, BADGE_CSS } from '../components/TriggerBadge/TriggerBadge'
 import App from '../components/App'
 
 export default defineContentScript({
@@ -18,6 +19,11 @@ export default defineContentScript({
       position: 'overlay',
       zIndex: 9999998,
       onMount(container) {
+        const shadowRoot = container.getRootNode() as ShadowRoot
+        const styleEl = document.createElement('style')
+        styleEl.textContent = reactflowCss
+        shadowRoot.prepend(styleEl)
+
         const root = createRoot(container)
         root.render(createElement(App))
         return root
@@ -38,7 +44,14 @@ export default defineContentScript({
       wrap.setAttribute('data-mermaid-badge', block.id)
       Object.assign(wrap.style, { position: 'absolute', top: '8px', right: '8px', zIndex: '9999', display: 'none' })
 
-      const root = createRoot(wrap)
+      const badgeShadow = wrap.attachShadow({ mode: 'open' })
+      const badgeStyle = document.createElement('style')
+      badgeStyle.textContent = BADGE_CSS
+      badgeShadow.appendChild(badgeStyle)
+      const mountPoint = document.createElement('div')
+      badgeShadow.appendChild(mountPoint)
+
+      const root = createRoot(mountPoint)
       root.render(createElement(TriggerBadge, {
         onEdit: () => useEditorStore.getState().openEditor(block.code, diagramType, block.id),
       }))
@@ -68,3 +81,4 @@ export default defineContentScript({
     })
   },
 })
+
