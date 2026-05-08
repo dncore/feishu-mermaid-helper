@@ -1,4 +1,5 @@
-import { defineContentScript, createShadowRootUi } from 'wxt/client'
+import { defineContentScript } from 'wxt/utils/define-content-script'
+import { createShadowRootUi } from 'wxt/utils/content-script-ui/shadow-root'
 import { createRoot, type Root } from 'react-dom/client'
 import { createElement } from 'react'
 import { startDetector } from '../lib/detector'
