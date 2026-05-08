@@ -10,6 +10,7 @@
     "build": "wxt build",
     "test": "vitest run",
     "test:watch": "vitest",
+    "zip": "wxt zip",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
