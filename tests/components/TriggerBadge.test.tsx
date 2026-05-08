@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { createEvent, fireEvent, render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { TriggerBadge } from '../../src/components/TriggerBadge/TriggerBadge'
 
@@ -14,10 +14,10 @@ describe('TriggerBadge', () => {
     )
 
     const button = screen.getByRole('button', { name: '✏️ Edit visually' })
-    const event = new MouseEvent('click', { bubbles: true, cancelable: true })
-    const dispatched = button.dispatchEvent(event)
+    const event = createEvent.click(button, { bubbles: true, cancelable: true })
+    fireEvent(button, event)
 
-    expect(dispatched).toBe(false)
+    expect(event.defaultPrevented).toBe(true)
     expect(onEdit).toHaveBeenCalledTimes(1)
     expect(onParentClick).not.toHaveBeenCalled()
   })
