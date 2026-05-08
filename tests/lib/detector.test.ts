@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { findMermaidBlocks, ATTR_ID } from '../../src/lib/detector'
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { findMermaidBlocks, ATTR_ID, startDetector } from '../../src/lib/detector'
 
 function appendDiv(cls: string, text: string): HTMLElement {
   const el = document.createElement('div')
@@ -63,5 +63,36 @@ describe('findMermaidBlocks', () => {
     const first = findMermaidBlocks()
     const second = findMermaidBlocks()
     expect(first[0].id).toBe(second[0].id)
+  })
+
+  it('does not duplicate blocks matched by multiple selectors', () => {
+    const el = document.createElement('div')
+    el.className = 'mermaid'
+    el.setAttribute('data-language', 'mermaid')
+    el.textContent = 'graph TD\n  A-->B'
+    document.body.appendChild(el)
+
+    expect(findMermaidBlocks()).toHaveLength(1)
+  })
+})
+
+describe('startDetector', () => {
+  it('reports existing blocks immediately and newly added blocks once', async () => {
+    appendDiv('mermaid', 'graph TD\n  A --> B')
+    const onDetected = vi.fn()
+
+    const stop = startDetector(onDetected)
+    expect(onDetected).toHaveBeenCalledTimes(1)
+
+    appendDiv('mermaid', 'graph TD\n  B --> C')
+    await Promise.resolve()
+
+    expect(onDetected).toHaveBeenCalledTimes(2)
+
+    stop()
+    appendDiv('mermaid', 'graph TD\n  C --> D')
+    await Promise.resolve()
+
+    expect(onDetected).toHaveBeenCalledTimes(2)
   })
 })
