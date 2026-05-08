@@ -14,6 +14,13 @@ export default defineContentScript({
   cssInjectionMode: 'ui',
 
   async main(ctx) {
+    // Track mouse position so we can detect when the mouse leaves an iframe-containing block.
+    // Mouse events stop reaching the parent document while the cursor is inside a cross-origin
+    // iframe, so we rely on the last known position plus a poll loop for the hide path.
+    let mouseX = 0
+    let mouseY = 0
+    document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY }, { passive: true })
+
     const ui = await createShadowRootUi(ctx, {
       name: 'feishu-mermaid-editor',
       position: 'overlay',
@@ -62,9 +69,31 @@ export default defineContentScript({
       abortControllers.push(ac)
 
       el.appendChild(wrap)
-      el.addEventListener('mouseenter', () => { wrap.style.display = 'block' }, { signal })
+
+      // Poll until the mouse leaves the block bounding rect.
+      // Needed because cross-origin iframes swallow mouse events — mouseleave fires
+      // with relatedTarget=null when the cursor enters the iframe, and no further
+      // events reach the parent until the cursor exits the iframe entirely.
+      let pollTimer: ReturnType<typeof setTimeout> | null = null
+      function startHidePoll() {
+        if (pollTimer !== null) return
+        pollTimer = setTimeout(function check() {
+          const r = el.getBoundingClientRect()
+          if (mouseX >= r.left && mouseX <= r.right && mouseY >= r.top && mouseY <= r.bottom) {
+            pollTimer = setTimeout(check, 150)
+          } else {
+            wrap.style.display = 'none'
+            pollTimer = null
+          }
+        }, 150)
+      }
+      signal.addEventListener('abort', () => { if (pollTimer !== null) { clearTimeout(pollTimer); pollTimer = null } })
+
+      el.addEventListener('mouseenter', () => { wrap.style.display = 'block'; startHidePoll() }, { signal })
       el.addEventListener('mouseleave', (e) => {
         if (wrap.contains(e.relatedTarget as Node)) return
+        // relatedTarget is null when cursor enters a cross-origin iframe — use poll
+        if (e.relatedTarget === null) { startHidePoll(); return }
         wrap.style.display = 'none'
       }, { signal })
       wrap.addEventListener('mouseenter', () => { wrap.style.display = 'block' }, { signal })
