@@ -1,5 +1,5 @@
 import { defineContentScript, createShadowRootUi } from 'wxt/client'
-import { createRoot } from 'react-dom/client'
+import { createRoot, type Root } from 'react-dom/client'
 import { createElement } from 'react'
 import { startDetector } from '../lib/detector'
 import { detectDiagramType } from '../lib/diagramType'
@@ -25,6 +25,9 @@ export default defineContentScript({
     })
     ui.mount()
 
+    const roots: Root[] = []
+    const abortControllers: AbortController[] = []
+
     const stop = startDetector((block) => {
       const diagramType = detectDiagramType(block.code)
       const el = block.element as HTMLElement
@@ -34,17 +37,33 @@ export default defineContentScript({
       wrap.setAttribute('data-mermaid-badge', block.id)
       Object.assign(wrap.style, { position: 'absolute', top: '8px', right: '8px', zIndex: '9999', display: 'none' })
 
-      createRoot(wrap).render(createElement(TriggerBadge, {
+      const root = createRoot(wrap)
+      root.render(createElement(TriggerBadge, {
         onEdit: () => useEditorStore.getState().openEditor(block.code, diagramType, block.id),
       }))
+      roots.push(root)
+
+      const ac = new AbortController()
+      const { signal } = ac
+      abortControllers.push(ac)
 
       el.appendChild(wrap)
-      el.addEventListener('mouseenter', () => { wrap.style.display = 'block' })
-      el.addEventListener('mouseleave', () => { wrap.style.display = 'none' })
-      wrap.addEventListener('mouseenter', () => { wrap.style.display = 'block' })
-      wrap.addEventListener('mouseleave', () => { wrap.style.display = 'none' })
+      el.addEventListener('mouseenter', () => { wrap.style.display = 'block' }, { signal })
+      el.addEventListener('mouseleave', (e) => {
+        if (wrap.contains(e.relatedTarget as Node)) return
+        wrap.style.display = 'none'
+      }, { signal })
+      wrap.addEventListener('mouseenter', () => { wrap.style.display = 'block' }, { signal })
+      wrap.addEventListener('mouseleave', (e) => {
+        if (el.contains(e.relatedTarget as Node)) return
+        wrap.style.display = 'none'
+      }, { signal })
     })
 
-    ctx.onInvalidated(stop)
+    ctx.onInvalidated(() => {
+      stop()
+      abortControllers.forEach(ac => ac.abort())
+      roots.forEach(r => r.unmount())
+    })
   },
 })
