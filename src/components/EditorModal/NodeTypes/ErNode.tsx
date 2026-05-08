@@ -1,7 +1,7 @@
-import { Handle, Position, type NodeProps } from '@xyflow/react'
+import { Handle, Position, type NodeProps, type Node } from '@xyflow/react'
 import type { ErNodeData } from '../../../lib/types'
 
-export function ErNode({ data }: NodeProps<ErNodeData>) {
+export function ErNode({ data }: NodeProps<Node<ErNodeData>>) {
   return (
     <div style={{ background: 'white', border: '2px solid #f76707', borderRadius: 6,
       fontSize: 12, minWidth: 160, cursor: 'grab', overflow: 'hidden' }}>

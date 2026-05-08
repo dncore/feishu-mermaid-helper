@@ -1,7 +1,7 @@
-import { Handle, Position, type NodeProps } from '@xyflow/react'
+import { Handle, Position, type NodeProps, type Node } from '@xyflow/react'
 import type { ClassNodeData } from '../../../lib/types'
 
-export function ClassNode({ data }: NodeProps<ClassNodeData>) {
+export function ClassNode({ data }: NodeProps<Node<ClassNodeData>>) {
   return (
     <div style={{ background: 'white', border: '2px solid #5c7cfa', borderRadius: 6,
       fontSize: 12, minWidth: 160, cursor: 'grab', overflow: 'hidden' }}>
